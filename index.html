@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOLFLIX | Superman & Lois: The Origin</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        netflixRed: '#E50914',
+                        superBlue: '#005bb5',
+                        superDark: '#011c38',
+                        superRed: '#e60000',
+                        superYellow: '#f1c40f',
+                        kryptonite: '#2ecc71',
+                        surface: '#181818',
+                        success: '#2b9348'
+                    },
+                    fontFamily: {
+                        bebas: ['"Bebas Neue"', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* FIXED VIEWPORT - STRICTLY NO BODY SCROLLING */
+        body {
+            background-color: #011c38;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dynamic Background System */
+        #dynamic-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1596727147705-611529d3e1cb?auto=format&fit=crop&q=80');
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            opacity: 0.25; z-index: 0; transition: background-image 1.5s ease-in-out, opacity 1.5s ease-in-out;
+            pointer-events: none; filter: contrast(1.1) brightness(0.7);
+        }
+        #bg-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, #011c38 100%),
+                        linear-gradient(to top, #011c38 0%, rgba(1,28,56,0.7) 50%, #011c38 100%);
+            z-index: 1; pointer-events: none;
+        }
+
+        /* Fixed Step Management */
+        main {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .step-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: none; opacity: 0;
+            flex-direction: column; align-items: center; justify-content: center;
+            padding: 2rem; z-index: 10;
+        }
+        .step-container.active {
+            display: flex; opacity: 1; animation: focusIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes focusIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); filter: blur(5px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        /* Glassmorphism Panel - Internal Scroll Only */
+        .glass-panel {
+            background: rgba(1, 28, 56, 0.85);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(241, 196, 15, 0.2); border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(241, 196, 15, 0.15);
+            max-width: 1100px; width: 100%;
+            max-height: 82vh; 
+            overflow-y: auto; 
+            padding: 3rem;
+            position: relative;
+        }
+        
+        .glass-panel::-webkit-scrollbar { width: 8px; }
+        .glass-panel::-webkit-scrollbar-track { background: transparent; }
+        .glass-panel::-webkit-scrollbar-thumb { background: rgba(230, 0, 0, 0.5); border-radius: 10px; }
+
+        .netflix-title { font-family: 'Bebas Neue', sans-serif; letter-spacing: 3px; }
+        .super-gradient {
+            background: linear-gradient(90deg, #005bb5, #e60000, #f1c40f);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+
+        /* Capsules */
+        .capsule {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 24px;
+            background: rgba(0, 91, 181, 0.3); border: 1px solid #005bb5; border-radius: 500px;
+            font-size: 1.1rem; font-weight: bold; letter-spacing: 0.1em; color: #FFF;
+            text-transform: uppercase; box-shadow: 0 4px 15px rgba(0, 91, 181, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .capsule.red { border-color: #e60000; background: rgba(230, 0, 0, 0.2); box-shadow: 0 4px 15px rgba(230, 0, 0, 0.3); }
+
+        /* Speaking Hub */
+        .speaking-hub {
+            position: relative; background: rgba(0, 0, 0, 0.6);
+            border-left: 6px solid #f1c40f; border-radius: 0 16px 16px 0;
+            padding: 2.5rem; margin-top: 2rem;
+            box-shadow: inset 0 0 30px rgba(241, 196, 15, 0.05);
+        }
+        .speaking-hub::before {
+            content: '🎙️ SPEAKING HUB'; position: absolute; top: -14px; left: 24px;
+            background: #f1c40f; color: #000; font-weight: 800; font-size: 0.9rem;
+            letter-spacing: 0.1em; padding: 4px 16px; border-radius: 4px;
+        }
+        .speaking-starter {
+            display: inline-block; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15); color: #E5E5E5;
+            padding: 10px 20px; border-radius: 8px; font-size: 1.1rem;
+            margin: 6px; font-style: italic; transition: all 0.3s; cursor: default;
+        }
+        .speaking-starter:hover { border-color: #005bb5; background: rgba(0, 91, 181, 0.2); transform: translateX(5px); }
+
+        /* Interactive Elements */
+        .vocab-trigger { color: #f1c40f; border-bottom: 2px dashed #f1c40f; cursor: pointer; font-weight: 700; transition: all 0.2s; }
+        .vocab-trigger:hover { color: #FFF; border-bottom-style: solid; text-shadow: 0 0 15px rgba(241, 196, 15, 0.8); }
+
+        .btn-netflix {
+            background-color: #e60000; color: #FFF; font-weight: 800;
+            padding: 16px 36px; border-radius: 8px; transition: all 0.3s; 
+            text-transform: uppercase; letter-spacing: 2px; font-size: 1.2rem;
+            box-shadow: 0 8px 25px rgba(230, 0, 0, 0.3); border: none; cursor: pointer;
+        }
+        .btn-netflix:hover { background-color: #ff1a1a; transform: scale(1.02); box-shadow: 0 12px 35px rgba(230, 0, 0, 0.5); }
+
+        /* Sentence Builder */
+        .sb-word {
+            background: #FFF; color: #011c38; font-weight: 800; padding: 12px 24px; border-radius: 8px;
+            cursor: pointer; user-select: none; transition: all 0.2s; border: 3px solid transparent;
+            font-size: 1.3rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .sb-word:hover { transform: translateY(-4px); border-color: #005bb5; }
+        .sb-dropzone { min-height: 90px; border: 3px dashed rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; transition: all 0.3s; background: rgba(0,0,0,0.3); }
+        .sb-dropzone.correct { border-color: #2b9348; background: rgba(43, 147, 72, 0.15); }
+        .sb-dropzone.incorrect { border-color: #e60000; background: rgba(230, 0, 0, 0.15); animation: shake 0.4s; }
+
+        /* Grammar Sandbox */
+        .grammar-btn {
+            background: #011c38; border: 2px solid #005bb5; color: #FFF; padding: 12px 24px; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: bold; font-size: 1.2rem;
+        }
+        .grammar-btn:hover { border-color: #f1c40f; }
+        .grammar-btn.active { background: #f1c40f; border-color: #f1c40f; color: #000; box-shadow: 0 0 15px rgba(241, 196, 15, 0.6); }
+        .grammar-display {
+            font-size: 2.8rem; font-weight: 800; background: #000; padding: 30px; border-radius: 16px; border: 2px dashed #005bb5; display: flex; justify-content: center; align-items: center; gap: 15px; transition: all 0.3s; flex-wrap: wrap; text-align: center;
+        }
+
+        /* Kryptonian Crystals */
+        .crystal-slot {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(0, 91, 181, 0.4));
+            border: 2px solid #005bb5; border-radius: 8px 8px 30px 30px;
+            padding: 20px; text-align: center; color: white; font-weight: bold; font-size: 2rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(0, 91, 181, 0.2), inset 0 0 15px rgba(0, 91, 181, 0.2);
+            clip-path: polygon(10% 0, 90% 0, 100% 20%, 100% 80%, 50% 100%, 0 80%, 0 20%);
+            min-height: 120px; display: flex; align-items: center; justify-content: center; margin: 0 auto; width: 80%;
+        }
+        .crystal-slot.activated {
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(230, 0, 0, 0.5));
+            border-color: #f1c40f; color: #f1c40f;
+            box-shadow: 0 0 30px rgba(230, 0, 0, 0.4), inset 0 0 20px rgba(241, 196, 15, 0.4);
+            transform: scale(1.05);
+        }
+        
+        /* Phantom Zone Projector */
+        .phantom-slot {
+            background: radial-gradient(circle, rgba(230,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
+            border: 2px solid #e60000; border-radius: 50%;
+            width: 200px; height: 200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; font-weight: bold; color: #fff;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 30px rgba(230,0,0,0.3), inset 0 0 40px rgba(230,0,0,0.5);
+            text-align: center; padding: 20px;
+        }
+        .phantom-slot.activated {
+            box-shadow: 0 0 50px #e60000, inset 0 0 50px #e60000;
+            text-shadow: 0 0 10px #fff;
+            border-color: #ff1a1a;
+        }
+
+        /* Script Analysis */
+        .script-line {
+            background: rgba(0, 0, 0, 0.5); padding: 16px 24px; border-radius: 8px; font-weight: 500;
+            transition: all 0.3s; cursor: pointer; border: 1px solid transparent; margin-bottom: 12px;
+        }
+        .script-line:hover { background: rgba(0, 91, 181, 0.3); border-color: #f1c40f; transform: translateX(10px); }
+        .script-line.lois { border-left: 4px solid #e60000; }
+        .script-line.clark { border-left: 4px solid #005bb5; }
+
+        /* Heat Vision Error Detection */
+        .error-text span { 
+            cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: all 0.3s; font-weight: bold; display: inline-block;
+        }
+        .error-text span:hover { 
+            color: #ffcccc; text-shadow: 0 0 10px #e60000; background: rgba(230, 0, 0, 0.2); transform: scale(1.05);
+        }
+        .error-text span.wrong-clicked { color: #2ecc71; text-shadow: 0 0 15px #2ecc71; background: rgba(46, 204, 113, 0.1); }
+        .error-text span.correct-clicked { animation: shake 0.4s; color: #666; pointer-events: none; }
+
+        /* Sliding Panels */
+        .side-panel { position: fixed; top: 0; right: -100%; width: 100%; max-width: 500px; height: 100vh; background: rgba(1,28,56,0.98); backdrop-filter: blur(20px); border-left: 1px solid #005bb5; z-index: 50; transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: -20px 0 50px rgba(0,0,0,0.9); }
+        .side-panel.open { right: 0; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 40; display: none; opacity: 0; transition: opacity 0.4s; backdrop-filter: blur(5px); }
+        .overlay.active { display: block; opacity: 1; }
+
+        /* Quiz Option */
+        .quiz-option {
+            background: rgba(0, 0, 0, 0.5); border: 2px solid #005bb5; color: #FFF;
+            padding: 15px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+            font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 12px;
+        }
+        .quiz-option:hover { border-color: #f1c40f; background: rgba(241, 196, 15, 0.1); transform: translateX(5px); }
+        .quiz-option.correct { border-color: #2b9348; background: rgba(43, 147, 72, 0.3); }
+        .quiz-option.incorrect { border-color: #e60000; background: rgba(230, 0, 0, 0.3); animation: shake 0.4s; }
+
+        /* Flip Cards */
+        .arena-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .flip-card { background-color: transparent; height: 260px; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+        .flip-card-front { background: rgba(0, 91, 181, 0.4); border: 1px solid #f1c40f; }
+        .flip-card-back { background: #f1c40f; color: #000; transform: rotateY(180deg); }
+
+        /* Chat Scenarios */
+        .chat-bubble { max-width: 85%; padding: 14px 20px; border-radius: 20px; font-size: 1.2rem; line-height: 1.4; margin-bottom: 12px; }
+        .chat-left { background: #005bb5; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-right { background: #e60000; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+    </style>
+</head>
+<body class="text-lg md:text-xl">
+
+    <div id="dynamic-bg"></div>
+    <div id="bg-overlay"></div>
+
+    <header class="h-20 md:h-24 flex items-center justify-between px-8 md:px-10 shrink-0 relative z-20 bg-gradient-to-b from-[#011c38]/90 to-transparent">
+        <div class="flex items-center gap-6">
+            <span class="netflix-title text-4xl md:text-5xl text-netflixRed tracking-widest font-bold">WOLFLIX</span>
+            <span class="px-3 py-1 border border-gray-400 rounded text-xs tracking-widest text-gray-200 uppercase hidden md:block font-bold">DC Edition</span>
+        </div>
+
+        <div class="flex-1 max-w-2xl mx-12 hidden lg:block">
+            <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-superRed transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-8">
+            <button onclick="toggleFullscreen()" class="text-gray-300 hover:text-white transition-colors" title="Fullscreen">
+                <i data-lucide="maximize" class="w-7 h-7"></i>
+            </button>
+            <button onclick="toggleWhiteboard()" class="text-gray-300 hover:text-white transition-colors flex items-center gap-3">
+                <i data-lucide="pen-tool" class="w-7 h-7"></i>
+                <span class="hidden sm:inline text-lg font-bold uppercase tracking-wider">Notebook</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="lesson-container">
+
+        <!-- STEP 1: Briefing -->
+        <section class="step-container active flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h1 class="netflix-title text-6xl md:text-8xl text-white mb-6 drop-shadow-lg">Director's Briefing</h1>
+                
+                <p class="text-2xl text-gray-300 leading-relaxed mb-10 max-w-4xl mx-auto">
+                    Welcome to WOLFLIX. Today we watch the beautiful opening scene from <strong class="text-superRed">Superman & Lois</strong>. It is a story about memories, family, and life changes.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 text-left">
+                    <div class="bg-black/50 p-8 rounded-xl border-l-8 border-superBlue shadow-lg">
+                        <h3 class="font-bold text-white text-2xl mb-4 flex items-center gap-3"><i data-lucide="film" class="text-superBlue"></i> The Theme</h3>
+                        <p class="text-gray-300 text-xl leading-relaxed">The origin story. Clark Kent remembers his past, from his arrival on Earth to building his family.</p>
+                    </div>
+                    <div class="bg-black/50 p-8 rounded-xl border-l-8 border-superYellow shadow-lg">
+                        <h3 class="font-bold text-white text-2xl mb-4 flex items-center gap-3"><i data-lucide="clock" class="text-superYellow"></i> The Grammar</h3>
+                        <p class="text-gray-300 text-xl leading-relaxed">Level A2 (Pre-Intermediate): Learn to talk about your past using the <strong class="text-white">Simple Past</strong> (Regular, Irregular, and Negative forms).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 2: Cover -->
+        <section class="step-container">
+            <div class="text-center">
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <span class="capsule"><i data-lucide="bar-chart" class="w-5 h-5"></i> Level A2</span>
+                    <span class="capsule red"><i data-lucide="clock" class="w-5 h-5"></i> Simple Past</span>
+                </div>
+
+                <h1 class="netflix-title text-[5rem] md:text-[8rem] lg:text-[10rem] super-gradient drop-shadow-2xl mb-4 leading-none text-center">
+                    SUPERMAN & LOIS
+                </h1>
+                <p class="text-3xl md:text-5xl text-white font-light tracking-[0.4em] uppercase drop-shadow-lg mb-8">
+                    The Origin Story
+                </p>
+                <p class="text-xl md:text-3xl text-gray-200 font-light max-w-4xl mx-auto drop-shadow-lg leading-relaxed bg-black/50 p-6 rounded-xl backdrop-blur-sm border border-gray-700 mb-10">
+                    "My most vivid memories are of the days when my life changed."
+                </p>
+                
+                <button onclick="nextStep()" class="btn-netflix">Initialize Lesson</button>
+            </div>
+        </section>
+
+        <!-- STEP 3: Warm-up -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superYellow mb-4">
+                    <i data-lucide="message-square" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Warm-up</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Your Memories</h2>
+                
+                <p class="text-2xl text-gray-200 mb-10 leading-relaxed">We all have days that change our lives forever. A new school, a new city, or meeting a special person.</p>
+                
+                <div class="speaking-hub">
+                    <p class="text-white mb-6 font-bold text-2xl">Discuss with your teacher:</p>
+                    <div class="flex flex-col gap-4">
+                        <span class="speaking-starter w-fit">What is your favorite memory from childhood? -> My favorite memory is...</span>
+                        <span class="speaking-starter w-fit">Did you ever move to a new city? -> Yes, I moved to... / No, I didn't.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 4: The Story (Synopsis) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superRed mb-4">
+                    <i data-lucide="file-text" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">The Story</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">The Synopsis</h2>
+                <p class="text-gray-300 mb-8 text-2xl">Read the story. Click the yellow words to open the dictionary.</p>
+
+                <div class="bg-black/60 p-10 rounded-xl border-l-4 border-superYellow shadow-lg text-2xl leading-loose text-gray-200">
+                    "Clark Kent's life changed completely. When he was older, he <span class="vocab-trigger" onclick="openDictionary('Moved', 'Past tense of move. To go to a different place to live.', 'He moved to New York last year.', 'Have you ever moved to a different house?')">moved</span> to Metropolis. There, he <span class="vocab-trigger" onclick="openDictionary('Met', 'Past tense of meet. To see and speak to someone for the first time.', 'I met my best friend at school.', 'Where did you meet your best friend?')">met</span> a reporter named Lois Lane. They <span class="vocab-trigger" onclick="openDictionary('Fell in love', 'To start feeling love for someone.', 'Romeo and Juliet fell in love.', 'Do you believe people can fall in love fast?')">fell in love</span>. They <span class="vocab-trigger" onclick="openDictionary('Married', 'Past tense of marry. To become husband and wife.', 'My parents married in 1990.', 'Do you want to get married one day?')">married</span> and had <span class="vocab-trigger" onclick="openDictionary('Twins', 'Two children born to the same mother at the same time.', 'Jordan and Jonathan are twins.', 'Do you know any twins?')">twins</span>. One was easy, but the other had a lot of challenges."
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 5: Vocabulary 1 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-6">Life Events</h2>
+                <p class="text-gray-300 mb-10 text-2xl">Let's review some important vocabulary before we watch.</p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-black/50 p-12 rounded-xl border-t-4 border-superYellow hover:bg-black/70 transition-colors">
+                        <i data-lucide="brain" class="w-16 h-16 text-superYellow mx-auto mb-6"></i>
+                        <p class="text-4xl font-light">A vivid <span class="vocab-trigger" onclick="openDictionary('Memory', 'Something that you remember from the past.', 'I have a good memory.', 'What is your earliest memory?')">memory</span>.</p>
+                    </div>
+                    <div class="bg-black/50 p-12 rounded-xl border-t-4 border-superYellow hover:bg-black/70 transition-colors">
+                        <i data-lucide="users" class="w-16 h-16 text-superYellow mx-auto mb-6"></i>
+                        <p class="text-4xl font-light">They are <span class="vocab-trigger" onclick="openDictionary('Twins', 'Two children born at the same time.', 'The brothers are twins.', 'Are twins always identical?')">twins</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 6: Vocabulary 2 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-6">More Vocabulary</h2>
+                <p class="text-gray-300 mb-10 text-2xl">Pay attention to these words in the video.</p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-black/50 p-12 rounded-xl border-t-4 border-superBlue hover:bg-black/70 transition-colors">
+                        <i data-lucide="shirt" class="w-16 h-16 text-superBlue mx-auto mb-6"></i>
+                        <p class="text-4xl font-light">A superhero <span class="vocab-trigger" onclick="openDictionary('Costume', 'Clothes worn by an actor or a superhero.', 'Batman has a black costume.', 'Do you like to wear costumes on Halloween?')">costume</span>.</p>
+                    </div>
+                    <div class="bg-black/50 p-12 rounded-xl border-t-4 border-superBlue hover:bg-black/70 transition-colors">
+                        <i data-lucide="newspaper" class="w-16 h-16 text-superBlue mx-auto mb-6"></i>
+                        <p class="text-4xl font-light">Lois is a <span class="vocab-trigger" onclick="openDictionary('Journalist', 'A person who writes news for a newspaper or TV.', 'The journalist asked many questions.', 'Is it hard to be a journalist?')">journalist</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 7: Vocabulary 3 (Conflict) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-6">Challenges</h2>
+                <p class="text-gray-300 mb-10 text-2xl">Raising kids is not always easy.</p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-black/50 p-12 rounded-xl border-t-4 border-superRed hover:bg-black/70 transition-colors">
+                        <i data-lucide="frown" class="w-16 h-16 text-superRed mx-auto mb-6"></i>
+                        <p class="text-4xl font-light">He throws <span class="vocab-trigger" onclick="openDictionary('Tantrums', 'An uncontrolled outburst of anger and frustration, typical of young children.', 'The baby is having a tantrum.', 'Have you ever seen a child throw a tantrum?')">tantrums</span>.</p>
+                    </div>
+                    <div class="bg-black/50 p-12 rounded-xl border-t-4 border-superRed hover:bg-black/70 transition-colors">
+                        <i data-lucide="heart-pulse" class="w-16 h-16 text-superRed mx-auto mb-6"></i>
+                        <p class="text-4xl font-light">Social <span class="vocab-trigger" onclick="openDictionary('Anxiety', 'A feeling of worry, nervousness, or unease.', 'He has anxiety before tests.', 'What helps you calm down when you feel anxiety?')">anxiety</span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 8: Pre-Video -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <h2 class="netflix-title text-6xl mb-6">Before we watch</h2>
+                <p class="text-2xl text-gray-200 mb-10 leading-relaxed">We are going to watch the opening montage. Clark tells the story of his life.</p>
+                
+                <div class="speaking-hub">
+                    <p class="text-white mb-6 font-bold text-2xl">Look and listen. Try to answer:</p>
+                    <ul class="text-gray-300 text-2xl space-y-4 list-disc pl-8">
+                        <li>Who made his first superhero costume?</li>
+                        <li>What happened to his father?</li>
+                        <li>Which twin has social anxiety disorder?</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 9: The Video -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel flex flex-col items-center">
+                <h2 class="netflix-title text-6xl text-superRed mb-4 drop-shadow-md">THE ORIGIN STORY</h2>
+                <p class="text-gray-300 mb-8 text-2xl">Watch the scene. Notice the verbs in the past.</p>
+                
+                <div class="w-full max-w-4xl aspect-video rounded-xl overflow-hidden border-2 border-superBlue shadow-[0_20px_50px_rgba(0,91,181,0.5)] bg-black relative">
+                    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/IzdkVRZV4vc?start=1&rel=0" title="Superman Origin" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 10: Reaction -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <h2 class="netflix-title text-6xl mb-6">First Impressions</h2>
+                <p class="text-2xl text-gray-200 mb-10 leading-relaxed">It is a beautiful summary of his life.</p>
+                
+                <div class="speaking-hub">
+                    <p class="text-white mb-6 font-bold text-2xl">Talk to your teacher:</p>
+                    <div class="flex flex-col gap-4">
+                        <span class="speaking-starter w-fit">Did you like the video? -> Yes, I liked it because...</span>
+                        <span class="speaking-starter w-fit">What was the best part? -> The best part was when...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 11: Comprehension Check 1 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-8">Video Quiz 1</h2>
+                <p class="text-2xl text-gray-300 mb-10">Who made Clark's first superhero costume?</p>
+
+                <div class="flex flex-col gap-4 max-w-2xl mx-auto" id="quiz-1">
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-1', false)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">A</div>
+                        He bought it in a store.
+                    </div>
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-1', true)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">B</div>
+                        His mom made it for him.
+                    </div>
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-1', false)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">C</div>
+                        Lois made it for him.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 12: Comprehension Check 2 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-8">Video Quiz 2</h2>
+                <p class="text-2xl text-gray-300 mb-10">Why did he move to Metropolis?</p>
+
+                <div class="flex flex-col gap-4 max-w-2xl mx-auto" id="quiz-2">
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-2', true)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">A</div>
+                        Because of his father's death.
+                    </div>
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-2', false)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">B</div>
+                        Because he hated Smallville.
+                    </div>
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-2', false)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">C</div>
+                        Because he wanted to play baseball.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 13: Comprehension Check 3 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-8">Video Quiz 3</h2>
+                <p class="text-2xl text-gray-300 mb-10">Which twin has social anxiety disorder?</p>
+
+                <div class="flex flex-col gap-4 max-w-2xl mx-auto" id="quiz-3">
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-3', false)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">A</div>
+                        Jonathan (the one who is always smiling).
+                    </div>
+                    <div class="quiz-option" onclick="checkQuiz(this, 'quiz-3', true)">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-400 flex items-center justify-center shrink-0">B</div>
+                        Jordan (the one who is more challenging).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 14: Script Analysis 1 (Regular Verbs) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superRed mb-4">
+                    <i data-lucide="file-text" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Script Analysis 1</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">The Narration</h2>
+                <p class="text-gray-300 mb-8 text-2xl">Clark narrates his past. Click the highlighted verbs to see the explanation.</p>
+
+                <div class="flex flex-col gap-4 mb-8">
+                    <div class="script-line clark" onclick="showScriptFeedback('clark1')">
+                        <span class="text-superRed font-bold mr-4">CLARK:</span>
+                        <span class="text-2xl text-gray-200">My life <span class="text-superYellow font-bold border-b-2 border-superYellow pb-1">changed</span>.</span>
+                    </div>
+                    <div class="script-line clark" onclick="showScriptFeedback('clark2')">
+                        <span class="text-superRed font-bold mr-4">CLARK:</span>
+                        <span class="text-2xl text-gray-200">My mother <span class="text-superBlue font-bold border-b-2 border-superBlue pb-1">called</span> me their greatest surprise.</span>
+                    </div>
+                    <div class="script-line clark" onclick="showScriptFeedback('clark3')">
+                        <span class="text-superRed font-bold mr-4">CLARK:</span>
+                        <span class="text-2xl text-gray-200">Eventually, I <span class="text-superYellow font-bold border-b-2 border-superYellow pb-1">moved</span> to Metropolis.</span>
+                    </div>
+                </div>
+
+                <div class="bg-black/80 p-8 rounded-xl border border-gray-700 min-h-[120px] flex items-center justify-center">
+                    <p id="script-feedback-1" class="text-2xl text-gray-400 text-center italic">Click the grammar in the script above.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 15: Grammar 1 Intro (Regular) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superYellow mb-4">
+                    <i data-lucide="book-open" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Grammar 1</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Simple Past (Regular)</h2>
+                
+                <p class="text-2xl text-gray-200 mb-8">We use the Simple Past for actions that are 100% finished. For most regular verbs, we just add <strong class="text-superRed text-3xl">-ED</strong> or <strong class="text-superRed text-3xl">-D</strong>.</p>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8 text-center">
+                    <div class="bg-black/60 p-8 rounded-xl border-t-4 border-superBlue">
+                        <h4 class="text-gray-400 font-bold mb-4 text-xl uppercase">Present</h4>
+                        <p class="text-4xl text-white font-bold">Change</p>
+                    </div>
+                    <div class="bg-black/60 p-8 rounded-xl border-t-4 border-superRed">
+                        <h4 class="text-gray-400 font-bold mb-4 text-xl uppercase">Past</h4>
+                        <p class="text-4xl text-white font-bold">Change<span class="text-superRed">d</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 16: Grammar Machine 1 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <h2 class="netflix-title text-6xl mb-6">The Time Machine 1</h2>
+                <p class="text-2xl text-gray-200 mb-10 leading-relaxed">Click the Present verb to send it to the Past.</p>
+                
+                <div class="flex flex-wrap justify-center gap-6 mb-10">
+                    <button class="grammar-btn" onclick="updateGrammarPast('change')">Change</button>
+                    <button class="grammar-btn" onclick="updateGrammarPast('call')">Call</button>
+                    <button class="grammar-btn" onclick="updateGrammarPast('move')">Move</button>
+                </div>
+
+                <div class="grammar-display mb-10 min-h-[160px]" id="grammar-box-1">
+                    <span class="text-gray-500 italic text-3xl">Select a verb.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 17: Syntax Builder 1 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superBlue mb-4">
+                    <i data-lucide="layers" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Sentence Builder 1</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">The Big City</h2>
+                <p class="text-gray-300 mb-10 text-2xl">Unscramble the words to make a past sentence.</p>
+
+                <div id="dropzone-1" class="sb-dropzone mb-10" ondragover="event.preventDefault()"></div>
+                
+                <div id="wordbank-1" class="flex flex-wrap justify-center gap-6 mb-10">
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-1', 'wordbank-1')">Metropolis</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-1', 'wordbank-1')">moved</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-1', 'wordbank-1')">He</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-1', 'wordbank-1')">to</div>
+                </div>
+
+                <button onclick="checkSentenceBuilder('dropzone-1', ['He', 'moved', 'to', 'Metropolis'])" class="btn-netflix w-full">Check Answer</button>
+                <p id="sb-feedback-1" class="text-center mt-8 hidden font-bold text-3xl"></p>
+            </div>
+        </section>
+
+        <!-- STEP 18: Error Detection 1 (Heat Vision) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superRed mb-4">
+                    <i data-lucide="flame" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Heat Vision 1</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Find the Kryptonite</h2>
+                <p class="text-gray-300 mb-12 text-2xl">Hover to use Heat Vision. Click the INCORRECT word to fix the spelling!</p>
+
+                <div class="text-center text-4xl font-bold leading-loose error-text bg-black/50 p-12 rounded-xl border-l-8 border-kryptonite mb-8">
+                    "He <span onclick="checkError(this, true, 'moved', 'error-feedback-1')" class="wrong-target">moveed</span> <span onclick="checkError(this, false, '', 'error-feedback-1')">to</span> <span onclick="checkError(this, false, '', 'error-feedback-1')">Metropolis</span> <span onclick="checkError(this, false, '', 'error-feedback-1')">last</span> <span onclick="checkError(this, false, '', 'error-feedback-1')">year</span>."
+                </div>
+                <p id="error-feedback-1" class="text-center text-gray-400 text-2xl h-10 font-bold"></p>
+            </div>
+        </section>
+
+        <!-- STEP 19: Script Analysis 2 (Irregular) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superBlue mb-4">
+                    <i data-lucide="file-text" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Script Analysis 2</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Meeting Lois</h2>
+                <p class="text-gray-300 mb-8 text-2xl">Clark talks about Lois using irregular verbs. Click the highlighted words.</p>
+
+                <div class="flex flex-col gap-4 mb-8">
+                    <div class="script-line clark" onclick="showScriptFeedback('clark4')">
+                        <span class="text-superBlue font-bold mr-4">CLARK:</span>
+                        <span class="text-2xl text-gray-200">I <span class="text-superYellow font-bold border-b-2 border-superYellow pb-1">met</span> her.</span>
+                    </div>
+                    <div class="script-line clark" onclick="showScriptFeedback('clark5')">
+                        <span class="text-superBlue font-bold mr-4">CLARK:</span>
+                        <span class="text-2xl text-gray-200">We <span class="text-superRed font-bold border-b-2 border-superRed pb-1">fell</span> in love.</span>
+                    </div>
+                    <div class="script-line clark" onclick="showScriptFeedback('clark6')">
+                        <span class="text-superBlue font-bold mr-4">CLARK:</span>
+                        <span class="text-2xl text-gray-200">I <span class="text-superYellow font-bold border-b-2 border-superYellow pb-1">told</span> Lois who I really was.</span>
+                    </div>
+                </div>
+
+                <div class="bg-black/80 p-8 rounded-xl border border-gray-700 min-h-[120px] flex items-center justify-center">
+                    <p id="script-feedback-2" class="text-2xl text-gray-400 text-center italic">Click the grammar in the script above.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 20: Grammar 2 Intro (Irregular) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superYellow mb-4">
+                    <i data-lucide="book-open" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Grammar 2</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Simple Past (Irregular)</h2>
+                
+                <p class="text-2xl text-gray-200 mb-8">Some verbs are rebels! They don't take "-ED". They change completely. You have to memorize them.</p>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8 text-center">
+                    <div class="bg-black/60 p-8 rounded-xl border-t-4 border-superBlue">
+                        <h4 class="text-gray-400 font-bold mb-4 text-xl uppercase">Present</h4>
+                        <p class="text-4xl text-white font-bold">Meet</p>
+                    </div>
+                    <div class="bg-black/60 p-8 rounded-xl border-t-4 border-superYellow">
+                        <h4 class="text-gray-400 font-bold mb-4 text-xl uppercase">Past</h4>
+                        <p class="text-4xl text-white font-bold text-superYellow">Met</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 21: Grammar Machine 2 (Crystals) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-6">Kryptonian Crystals</h2>
+                <p class="text-2xl text-gray-200 mb-12">Irregular verbs change their form. Click "CONVERT" to reveal the past in the memory crystals.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <div class="flex flex-col gap-4">
+                        <span class="text-gray-400 font-bold uppercase tracking-widest text-sm">Present: Tell</span>
+                        <div id="crystal-1" class="crystal-slot">?</div>
+                        <button class="crystal-btn" onclick="activateCrystal(1, 'TOLD')">Convert</button>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <span class="text-gray-400 font-bold uppercase tracking-widest text-sm">Present: Meet</span>
+                        <div id="crystal-2" class="crystal-slot">?</div>
+                        <button class="crystal-btn" onclick="activateCrystal(2, 'MET')">Convert</button>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <span class="text-gray-400 font-bold uppercase tracking-widest text-sm">Present: Fall</span>
+                        <div id="crystal-3" class="crystal-slot">?</div>
+                        <button class="crystal-btn" onclick="activateCrystal(3, 'FELL')">Convert</button>
+                    </div>
+                </div>
+                <p id="crystal-feedback" class="text-superYellow font-bold text-2xl h-8 opacity-0 transition-opacity">All memories converted!</p>
+            </div>
+        </section>
+
+        <!-- STEP 22: Syntax Builder 2 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superRed mb-4">
+                    <i data-lucide="layers" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Sentence Builder 2</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">The Romance</h2>
+                <p class="text-gray-300 mb-10 text-2xl">Build the sentence about Clark and Lois.</p>
+
+                <div id="dropzone-2" class="sb-dropzone mb-10" ondragover="event.preventDefault()"></div>
+                
+                <div id="wordbank-2" class="flex flex-wrap justify-center gap-6 mb-10">
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-2', 'wordbank-2')">love</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-2', 'wordbank-2')">in</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-2', 'wordbank-2')">fell</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-2', 'wordbank-2')">They</div>
+                </div>
+
+                <button onclick="checkSentenceBuilder('dropzone-2', ['They', 'fell', 'in', 'love'])" class="btn-netflix w-full">Check Answer</button>
+                <p id="sb-feedback-2" class="text-center mt-8 hidden font-bold text-3xl"></p>
+            </div>
+        </section>
+
+        <!-- STEP 23: Error Detection 2 (Heat Vision) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-netflixRed mb-4">
+                    <i data-lucide="flame" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Heat Vision 2</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Find the Kryptonite</h2>
+                <p class="text-gray-300 mb-12 text-2xl">Hover to use Heat Vision. Click the INCORRECT word. Watch out for the irregular verb!</p>
+
+                <div class="text-center text-4xl font-bold leading-loose error-text bg-black/50 p-12 rounded-xl border-l-8 border-kryptonite mb-8">
+                    "They <span onclick="checkError(this, true, 'met', 'error-feedback-2')" class="wrong-target">meeted</span> <span onclick="checkError(this, false, '', 'error-feedback-2')">at</span> <span onclick="checkError(this, false, '', 'error-feedback-2')">work</span>."
+                </div>
+                <p id="error-feedback-2" class="text-center text-gray-400 text-2xl h-10 font-bold"></p>
+            </div>
+        </section>
+
+        <!-- STEP 24: Context Analysis (Negative) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superRed mb-4">
+                    <i data-lucide="search" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Context Analysis</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Missing the Past</h2>
+                <p class="text-gray-300 mb-8 text-2xl">Look at the facts about Clark's life. How do we say something DID NOT happen?</p>
+
+                <div class="flex flex-col gap-4 mb-8">
+                    <div class="bg-black/60 p-6 rounded-xl border-l-4 border-superYellow">
+                        <span class="text-xl text-gray-400">Fact 1: Clark moved to Metropolis.</span><br>
+                        <span class="text-2xl text-white">He <strong class="text-superRed">didn't stay</strong> in Smallville.</span>
+                    </div>
+                    <div class="bg-black/60 p-6 rounded-xl border-l-4 border-superYellow">
+                        <span class="text-xl text-gray-400">Fact 2: He kept a secret from the twins.</span><br>
+                        <span class="text-2xl text-white">He <strong class="text-superRed">didn't tell</strong> his sons the truth.</span>
+                    </div>
+                </div>
+
+                <div class="speaking-hub mt-0">
+                    <p class="text-white mb-2 font-bold text-2xl">Discuss:</p>
+                    <p class="text-gray-300 text-xl">What happens to the verbs "stay" and "tell" when we use "didn't"?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 25: Grammar 3 Intro (Negative) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superYellow mb-4">
+                    <i data-lucide="book-open" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Grammar 3</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">The Negative Past</h2>
+                
+                <p class="text-2xl text-gray-200 mb-8">To say "NO" in the past, we use <strong class="text-superRed text-3xl">didn't</strong>. <br><br>The rule is: <br><strong class="text-superYellow text-2xl">Subject + didn't + Normal Verb</strong>. <br>(The verb goes back to normal! No "ED", no irregular forms).</p>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-8 text-center">
+                    <div class="bg-black/60 p-8 rounded-xl border-t-4 border-success">
+                        <h4 class="text-gray-400 font-bold mb-4 text-xl uppercase">Positive</h4>
+                        <p class="text-3xl text-white font-light">"He <strong class="text-success font-bold">stayed</strong>."</p>
+                    </div>
+                    <div class="bg-black/60 p-8 rounded-xl border-t-4 border-netflixRed">
+                        <h4 class="text-gray-400 font-bold mb-4 text-xl uppercase">Negative</h4>
+                        <p class="text-3xl text-white font-light">"He <strong class="text-superRed font-bold">didn't stay</strong>."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 26: Grammar Machine 3 (Phantom Zone) -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center">
+                <h2 class="netflix-title text-6xl mb-6">Phantom Zone Projector</h2>
+                <p class="text-2xl text-gray-200 mb-10 leading-relaxed">Send the past verb into the Phantom Zone to turn it Negative!</p>
+                
+                <div class="flex justify-center gap-10 mb-10">
+                    <div class="flex flex-col gap-4">
+                        <button class="grammar-btn" onclick="updateGrammarNeg('stay', this)">Stayed</button>
+                        <button class="grammar-btn" onclick="updateGrammarNeg('tell', this)">Told</button>
+                    </div>
+                    <div class="phantom-slot" id="phantom-box">
+                        ?
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 27: Syntax Builder 3 -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superBlue mb-4">
+                    <i data-lucide="layers" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Sentence Builder 3</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">Leaving Home</h2>
+                <p class="text-gray-300 mb-10 text-2xl">Build the negative sentence.</p>
+
+                <div id="dropzone-3" class="sb-dropzone mb-10" ondragover="event.preventDefault()"></div>
+                
+                <div id="wordbank-3" class="flex flex-wrap justify-center gap-6 mb-10">
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-3', 'wordbank-3')">stay</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-3', 'wordbank-3')">in</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-3', 'wordbank-3')">He</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-3', 'wordbank-3')">didn't</div>
+                    <div class="sb-word" onclick="moveWord(this, 'dropzone-3', 'wordbank-3')">Smallville</div>
+                </div>
+
+                <button onclick="checkSentenceBuilder('dropzone-3', ['He', 'didn\'t', 'stay', 'in', 'Smallville'])" class="btn-netflix w-full">Check Answer</button>
+                <p id="sb-feedback-3" class="text-center mt-8 hidden font-bold text-3xl"></p>
+            </div>
+        </section>
+
+        <!-- STEP 28: The Arena -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superRed mb-2">
+                    <i data-lucide="swords" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">The Arena</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">City vs Town</h2>
+                <p class="text-gray-300 mb-10 text-2xl">Click the card and talk to your teacher.</p>
+
+                <div class="arena-grid">
+                    <div class="flip-card mx-auto max-w-md w-full" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-black/80 border-superRed">
+                                <i data-lucide="home" class="w-16 h-16 text-superRed mb-6"></i>
+                                <h3 class="font-bold text-white text-3xl uppercase tracking-widest">Question</h3>
+                            </div>
+                            <div class="flip-card-back" style="background: #e60000; color: #FFF;">
+                                <p class="text-3xl font-bold px-8 leading-relaxed">"Clark moved from a small town to a big city. Which one do you prefer to live in? Why?"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 29: Roleplay -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel">
+                <div class="inline-flex items-center gap-3 text-superBlue mb-4">
+                    <i data-lucide="users" class="w-8 h-8"></i>
+                    <span class="font-bold tracking-widest text-xl uppercase">Roleplay</span>
+                </div>
+                <h2 class="netflix-title text-6xl mb-6">The Interview</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-black/50 p-8 rounded-xl border-l-8 border-superRed shadow-lg">
+                        <p class="text-superRed font-bold mb-4 text-2xl uppercase tracking-wider">YOU: Lois Lane</p>
+                        <p class="text-gray-300 text-xl leading-relaxed">You are a journalist. Ask Clark questions about his past. (Where did you live? Why did you move?)</p>
+                    </div>
+                    <div class="bg-black/50 p-8 rounded-xl border-l-8 border-superBlue shadow-lg">
+                        <p class="text-superBlue font-bold mb-4 text-2xl uppercase tracking-wider">TEACHER: Clark Kent</p>
+                        <p class="text-gray-300 text-xl leading-relaxed">You are new to the city. Answer Lois's questions about your life in Smallville.</p>
+                    </div>
+                </div>
+
+                <div class="speaking-hub mt-0">
+                    <p class="text-white mb-6 font-bold text-2xl">Start the scene:</p>
+                    <div class="flex flex-col gap-4">
+                        <span class="speaking-starter w-fit">Hello, Clark. Nice to meet you.</span>
+                        <span class="speaking-starter w-fit">Where did you live before?</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- STEP 30: Wrap-up -->
+        <section class="step-container flex-col" data-bg="">
+            <div class="glass-panel text-center border border-gray-700">
+                <h2 class="netflix-title text-[7rem] text-white mb-4 drop-shadow-2xl leading-none">Episode Complete</h2>
+                <p class="text-2xl text-superBlue mb-10 uppercase tracking-[0.3em] font-bold">The story begins!</p>
+                
+                <h3 class="font-bold text-superYellow mb-6 text-3xl uppercase tracking-wider">Homework</h3>
+                
+                <div class="bg-black/60 p-8 rounded-xl text-left mb-10 border-l-8 border-superBlue shadow-inner mx-auto max-w-3xl">
+                    <ul class="text-gray-300 space-y-5 text-2xl leading-relaxed">
+                        <li><strong class="text-superBlue">•</strong> Write 3 things you did yesterday (Regular/Irregular).</li>
+                        <li><strong class="text-superBlue">•</strong> Write 2 things you <strong>didn't</strong> do last weekend.</li>
+                    </ul>
+                </div>
+
+                <button onclick="alert('Episode complete. Well done!')" class="btn-netflix flex items-center justify-center gap-4 py-4 text-2xl mx-auto w-full max-w-md">
+                    <i data-lucide="play" class="w-8 h-8 fill-current"></i>
+                    Finish Lesson
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Fixed Bottom Footer -->
+    <footer class="h-24 bg-black/95 border-t border-gray-800 flex justify-between items-center px-10 shrink-0 relative z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
+        <button id="btn-prev" onclick="prevStep()" class="px-8 py-3 border-2 border-gray-600 text-white hover:border-white hover:bg-white/5 transition-all rounded-lg uppercase font-bold text-lg tracking-widest disabled:opacity-20 flex items-center gap-3">
+            <i data-lucide="chevron-left" class="w-6 h-6"></i> Back
+        </button>
+        
+        <div class="text-lg text-gray-400 font-bold tracking-widest uppercase hidden sm:block">
+            Scene <span id="current-step-display" class="text-white text-xl mx-2">1</span> / 30
+        </div>
+
+        <button id="btn-next" onclick="nextStep()" class="px-8 py-3 bg-superRed text-white hover:bg-red-700 transition-all rounded-lg uppercase font-bold text-lg tracking-widest disabled:opacity-20 flex items-center gap-3 shadow-[0_0_15px_rgba(230,0,0,0.4)]">
+            Next <i data-lucide="chevron-right" class="w-6 h-6"></i>
+        </button>
+    </footer>
+
+    <!-- Overlays & Panels -->
+    <div id="overlay" class="overlay" onclick="closePanels()"></div>
+
+    <div id="dict-panel" class="side-panel p-10">
+        <div class="flex justify-between items-center mb-10 pb-6 border-b border-gray-800">
+            <h3 class="font-bold text-2xl text-white uppercase tracking-widest">Dictionary</h3>
+            <button onclick="closePanels()" class="text-gray-400 hover:text-white bg-surface p-2 rounded-full transition-colors">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+        </div>
+        <div class="space-y-8 flex-1 overflow-y-auto">
+            <div>
+                <p id="dict-word" class="netflix-title text-6xl text-superYellow mb-4 tracking-widest">Word</p>
+                <p id="dict-def" class="text-gray-300 text-2xl leading-relaxed">Definition goes here.</p>
+            </div>
+            <div class="bg-black/50 p-6 rounded-xl border-l-4 border-gray-600">
+                <p class="text-sm text-gray-500 uppercase tracking-widest mb-3 font-bold">Example</p>
+                <p id="dict-ex" class="text-gray-200 italic text-xl">"Example text."</p>
+            </div>
+            <div class="speaking-hub !mt-6 !p-8 !border-l-4 !border-superYellow">
+                <p id="dict-prompt" class="text-white text-xl font-bold leading-relaxed">Prompt text.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Director's Board -->
+    <div id="whiteboard-panel" class="side-panel p-10 flex flex-col">
+        <div class="flex justify-between items-center mb-6 pb-6 border-b border-gray-800">
+            <h3 class="font-bold text-2xl text-white uppercase tracking-widest flex items-center gap-3">
+                <i data-lucide="pen-tool" class="w-8 h-8 text-superBlue"></i> Notes
+            </h3>
+            <button onclick="closePanels()" class="text-gray-400 hover:text-white bg-surface p-2 rounded-full transition-colors">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+        </div>
+        <div class="flex gap-2 mb-6 bg-black/80 p-2 rounded-lg border border-gray-800 shadow-md">
+            <button onclick="addNoteTimestamp()" class="flex-1 flex items-center justify-center gap-2 text-sm text-gray-300 hover:text-white hover:bg-gray-800 py-2 rounded transition-colors font-bold" title="Insert Scene Tag">
+                <i data-lucide="tag" class="w-4 h-4"></i> Tag
+            </button>
+            <div class="w-px bg-gray-700 my-1"></div>
+            <button onclick="clearWhiteboard()" class="flex-1 flex items-center justify-center gap-2 text-sm text-gray-300 hover:text-netflixRed hover:bg-red-900/20 py-2 rounded transition-colors font-bold" title="Clear Notes">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Clear
+            </button>
+            <div class="w-px bg-gray-700 my-1"></div>
+            <button onclick="downloadNotes()" class="flex-1 flex items-center justify-center gap-2 text-sm text-white bg-superBlue hover:bg-blue-600 py-2 rounded transition-colors font-bold tracking-wider" title="Download as TXT">
+                <i data-lucide="download" class="w-4 h-4"></i> Save
+            </button>
+        </div>
+        <div class="flex-1 relative group flex flex-col">
+            <div class="absolute -inset-1 bg-gradient-to-b from-superBlue to-transparent opacity-0 group-focus-within:opacity-20 rounded-xl transition-opacity duration-500 blur-md pointer-events-none"></div>
+            <textarea id="whiteboard-textarea" class="relative flex-1 w-full bg-black/60 text-white resize-none outline-none border border-gray-700 p-6 rounded-xl focus:border-superBlue transition-all font-mono text-xl leading-relaxed shadow-inner" placeholder="Type your notes here..."></textarea>
+        </div>
+    </div>
+
+    <!-- Crystal & Phantom Zone Styles -->
+    <style>
+        .crystal-slot {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.1), rgba(0, 91, 181, 0.4));
+            border: 2px solid #005bb5; border-radius: 8px 8px 30px 30px;
+            padding: 20px; text-align: center; color: white; font-weight: bold; font-size: 2rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(0, 91, 181, 0.2), inset 0 0 15px rgba(0, 91, 181, 0.2);
+            clip-path: polygon(10% 0, 90% 0, 100% 20%, 100% 80%, 50% 100%, 0 80%, 0 20%);
+            min-height: 120px; display: flex; align-items: center; justify-content: center; margin: 0 auto; width: 80%;
+        }
+        .crystal-slot.activated {
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(230, 0, 0, 0.5));
+            border-color: #f1c40f; color: #f1c40f;
+            box-shadow: 0 0 30px rgba(230, 0, 0, 0.4), inset 0 0 20px rgba(241, 196, 15, 0.4);
+            transform: scale(1.05);
+        }
+        
+        .phantom-slot {
+            background: radial-gradient(circle, rgba(230,0,0,0.1) 0%, rgba(0,0,0,0.8) 100%);
+            border: 2px solid #e60000; border-radius: 50%;
+            width: 200px; height: 200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; font-weight: bold; color: #fff;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 30px rgba(230,0,0,0.3), inset 0 0 40px rgba(230,0,0,0.5);
+            text-align: center; padding: 20px;
+        }
+        .phantom-slot.activated {
+            box-shadow: 0 0 50px #e60000, inset 0 0 50px #e60000;
+            text-shadow: 0 0 10px #fff;
+            border-color: #ff1a1a;
+        }
+    </style>
+
+    <script>
+        lucide.createIcons();
+
+        // --- Navigation Logic (Fixed Viewport) ---
+        let currentStep = 0;
+        const steps = document.querySelectorAll('.step-container');
+        const totalSteps = steps.length;
+        const progressBar = document.getElementById('progress-bar');
+        const stepDisplay = document.getElementById('current-step-display');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        function updateUI() {
+            steps.forEach((step, index) => {
+                if(index === currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+
+            const progressPercentage = ((currentStep) / (totalSteps - 1)) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            stepDisplay.innerText = currentStep + 1;
+
+            btnPrev.disabled = currentStep === 0;
+            btnNext.style.display = currentStep === totalSteps - 1 ? 'none' : 'flex';
+        }
+
+        function nextStep() { if (currentStep < totalSteps - 1) { currentStep++; updateUI(); } }
+        function prevStep() { if (currentStep > 0) { currentStep--; updateUI(); } }
+
+        updateUI();
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'ArrowRight') nextStep();
+            if(e.key === 'ArrowLeft') prevStep();
+        });
+
+        // --- Panels ---
+        const overlay = document.getElementById('overlay');
+        const dictPanel = document.getElementById('dict-panel');
+        const wbPanel = document.getElementById('whiteboard-panel');
+
+        function openDictionary(word, def, ex, prompt) {
+            document.getElementById('dict-word').innerText = word;
+            document.getElementById('dict-def').innerText = def;
+            document.getElementById('dict-ex').innerText = `"${ex}"`;
+            document.getElementById('dict-prompt').innerText = prompt;
+            wbPanel.classList.remove('open');
+            dictPanel.classList.add('open');
+            overlay.classList.add('active');
+        }
+
+        function toggleWhiteboard() {
+            dictPanel.classList.remove('open');
+            wbPanel.classList.add('open');
+            overlay.classList.add('active');
+        }
+
+        function closePanels() {
+            dictPanel.classList.remove('open');
+            wbPanel.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+        
+        // Script Analysis Feedback Function
+        function showScriptFeedback(lineId) {
+            let feedbackText = "";
+            let fbBox = null;
+            
+            if(lineId === 'clark1') {
+                feedbackText = "<strong class='text-superYellow'>CHANGED:</strong> Regular verb. Present: Change. Past: Changed. (Add 'd').";
+                fbBox = document.getElementById('script-feedback-1');
+            } else if(lineId === 'clark2') {
+                feedbackText = "<strong class='text-superBlue'>CALLED:</strong> Regular verb. Present: Call. Past: Called. (Add 'ed').";
+                fbBox = document.getElementById('script-feedback-1');
+            } else if(lineId === 'clark3') {
+                feedbackText = "<strong class='text-superYellow'>MOVED:</strong> Regular verb. Present: Move. Past: Moved. (Add 'd').";
+                fbBox = document.getElementById('script-feedback-1');
+            } else if(lineId === 'clark4') {
+                feedbackText = "<strong class='text-superYellow'>MET:</strong> Irregular verb. Present: Meet. Past: Met.";
+                fbBox = document.getElementById('script-feedback-2');
+            } else if(lineId === 'clark5') {
+                feedbackText = "<strong class='text-superRed'>FELL:</strong> Irregular verb. Present: Fall. Past: Fell.";
+                fbBox = document.getElementById('script-feedback-2');
+            } else if(lineId === 'clark6') {
+                feedbackText = "<strong class='text-superYellow'>TOLD:</strong> Irregular verb. Present: Tell. Past: Told.";
+                fbBox = document.getElementById('script-feedback-2');
+            }
+
+            if(fbBox) {
+                fbBox.innerHTML = feedbackText;
+                fbBox.classList.remove('text-gray-400', 'italic');
+                fbBox.classList.add('text-white');
+            }
+        }
+
+        function checkQuiz(element, quizId, isCorrect) {
+            const container = document.getElementById(quizId);
+            const options = container.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+
+            if(isCorrect) {
+                element.classList.add('correct');
+            } else {
+                element.classList.add('incorrect');
+            }
+        }
+
+        // --- Grammar Sandbox Logic ---
+        function updateGrammarPast(verb) {
+            document.querySelectorAll('.grammar-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            const box = document.getElementById('grammar-box-1');
+            if(verb === 'change') box.innerHTML = `<span class="text-white">Change + d = </span> <span class="text-superRed font-bold">Changed</span>`;
+            if(verb === 'call') box.innerHTML = `<span class="text-white">Call + ed = </span> <span class="text-superRed font-bold">Called</span>`;
+            if(verb === 'move') box.innerHTML = `<span class="text-white">Move + d = </span> <span class="text-superRed font-bold">Moved</span>`;
+        }
+
+        function updateGrammarIrr(verb) {
+            document.querySelectorAll('.grammar-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            const box = document.getElementById('grammar-box-2');
+            if(verb === 'meet') box.innerHTML = `<span class="text-white">Meet &rarr; </span> <span class="text-superYellow font-bold">Met</span>`;
+            if(verb === 'fall') box.innerHTML = `<span class="text-white">Fall &rarr; </span> <span class="text-superYellow font-bold">Fell</span>`;
+            if(verb === 'tell') box.innerHTML = `<span class="text-white">Tell &rarr; </span> <span class="text-superYellow font-bold">Told</span>`;
+        }
+
+        function updateGrammarNeg(verb, btnElement) {
+            document.querySelectorAll('.grammar-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            const box = document.getElementById('phantom-box');
+            box.classList.add('activated');
+            
+            if(verb === 'stay') {
+                box.innerHTML = `<span class="text-white text-sm">Negative</span><br>didn't<br>stay`;
+            }
+            if(verb === 'tell') {
+                box.innerHTML = `<span class="text-white text-sm">Negative</span><br>didn't<br>tell`;
+            }
+            
+            setTimeout(() => {
+                box.classList.remove('activated');
+            }, 600);
+        }
+
+        // Kryptonian Crystals
+        let crystalsActivated = 0;
+        function activateCrystal(id, pastVerb) {
+            const crystal = document.getElementById('crystal-' + id);
+            if(!crystal.classList.contains('activated')) {
+                crystal.innerText = pastVerb;
+                crystal.classList.add('activated');
+                crystalsActivated++;
+                if(crystalsActivated === 3) {
+                    const fb = document.getElementById('crystal-feedback');
+                    fb.style.opacity = '1';
+                }
+            }
+        }
+
+        // --- Syntax Builders & Errors ---
+        function moveWord(element, dropzoneId, wordbankId) {
+            const dropzone = document.getElementById(dropzoneId);
+            const wordbank = document.getElementById(wordbankId);
+            dropzone.classList.remove('correct', 'incorrect');
+            if (element.parentElement.id === wordbankId) dropzone.appendChild(element);
+            else wordbank.appendChild(element);
+        }
+
+        function checkSentenceBuilder(dropzoneId, correctArray) {
+            const dropzone = document.getElementById(dropzoneId);
+            const words = Array.from(dropzone.children).map(child => child.innerText);
+            const feedback = document.getElementById('sb-feedback-' + dropzoneId.split('-')[1]);
+            feedback.classList.remove('hidden');
+
+            if (words.length !== correctArray.length) {
+                dropzone.className = 'sb-dropzone incorrect mb-10';
+                feedback.innerText = "Use all blocks!";
+                feedback.className = "text-center mt-6 text-superRed font-bold text-3xl";
+                return;
+            }
+
+            if (words.every((val, i) => val === correctArray[i])) {
+                dropzone.className = 'sb-dropzone correct mb-10';
+                feedback.innerText = "Good job!";
+                feedback.className = "text-center mt-6 text-success font-bold text-3xl";
+            } else {
+                dropzone.className = 'sb-dropzone incorrect mb-10';
+                feedback.innerText = "Try again.";
+                feedback.className = "text-center mt-6 text-superRed font-bold text-3xl";
+            }
+        }
+
+        function checkError(element, isActualError, correctWord, feedbackId) {
+            element.parentElement.querySelectorAll('span').forEach(s => s.className = '');
+            const feedback = document.getElementById(feedbackId);
+            if(isActualError) {
+                element.classList.add('wrong-clicked');
+                element.innerText = correctWord;
+                feedback.innerText = "Kryptonite Destroyed! Good job.";
+                feedback.style.color = "#2ecc71";
+            } else {
+                element.classList.add('correct-clicked');
+                feedback.innerText = "Word is correct. Look again.";
+                feedback.style.color = "#e60000";
+            }
+        }
+
+        // --- Whiteboard ---
+        function addNoteTimestamp() {
+            const textarea = document.getElementById('whiteboard-textarea');
+            const sceneNum = currentStep + 1;
+            textarea.value += `\n[ --- SCENE ${sceneNum} --- ]\n> `;
+            textarea.focus();
+        }
+        function clearWhiteboard() {
+            const textarea = document.getElementById('whiteboard-textarea');
+            if(textarea.value.trim() !== '' && confirm("Delete all notes?")) textarea.value = '';
+        }
+        function downloadNotes() {
+            const text = document.getElementById('whiteboard-textarea').value;
+            if(!text.trim()) return alert("Notes are empty!");
+            const blob = new Blob([text], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `WOLFLIX_Superman_${new Date().toISOString().split('T')[0]}.txt`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.target = '_blank'; anchor.style.display = 'none';
+            document.body.appendChild(anchor); anchor.click(); document.body.removeChild(anchor);
+        }
+    </script>
+</body>
+</html>
